@@ -10,11 +10,29 @@ Although I will be making attempts to create a quality solution demonstrating so
 
 ## Setup
 
-TODO: creating the database
-TODO: creating the SSL certificate
-TODO: creating the services, Docker containers
-TODO: launching it all
-TODO: test requests
+These steps will need to be revisited and simplified if and when I get Docker containers built for everything.
+
+### Python
+
+Python 3 with pipenv is required. The dependency libpq is needed to install psycopg2.
+
+* `apt-get install libpq-dev`
+* `pipenv install`
+
+### Postgres 11
+
+If you don't already have Postgres installed, you'll need [to do that](https://www.postgresql.org/download/linux/ubuntu/) (unless you go the MongoDB route but I haven't added that yet.)
+
+You may want to spin up Postgres using Docker (see below), but be wary of running non-scalable databases in containers. Containers are generally meant to come and go, and having your database instance suddenly get wiped out generally results in data loss.
+
+* `sdocker run -p 5432:5432 --name basic_jwt_postgres -e POSTGRES_PASSWORD=adminpass postgres:alpine`
+* `psql -h localhost -p 5432 -U postgres -f user_credentials.sql`
+
+* TODO: populate the database with some test data
+* TODO: creating the SSL certificate
+* TODO: creating the services, Docker containers
+* TODO: launching it all
+* TODO: test requests
 
 ## Architecture
 
@@ -26,7 +44,7 @@ The resource service accepts JWT requests and responds with 202 Accepted only if
 
 ## Data Schema
 
-A table with username, password, and JWT grants is assumed. The passwords must be [salted](https://en.wikipedia.org/wiki/Salt_(cryptography)) and hashed, for which a cli tool is provided.
+A table with username, password, and JWT grants is assumed. The passwords must be [salted](https://en.wikipedia.org/wiki/Salt_(cryptography)) and hashed.
 
 Setup instructions for Postgres will be provided, and Mongo if I feel like it.
 
@@ -34,11 +52,23 @@ Setup instructions for Postgres will be provided, and Mongo if I feel like it.
 
 * Nginx as a reverse proxy
 * [Falcon](https://falconframework.org/) + [Gunicorn](https://gunicorn.org/) to start
-** Bjoern may be faster but probably harder to set up, consider it a stretch goal
+  * Bjoern may be faster but probably harder to set up, consider it a stretch goal
 * [PyJWT](https://pyjwt.readthedocs.io/en/latest/) for token processing
+* [psycopg2](https://www.psycopg.org/) for Postgres connection
 * Docker with Alpine base images to wrap the services
+
+## Docker Cheatsheet
+
+The `docker run` command is only used on first creating the container. You need more Docker-fu to manage existing containers. Exiting a running container doesn't delete it, merely stops it.
+
+* `docker ps -a`
+* `docker start basic_jwt_postgres`
+* `docker stop basic_jwt_postgres`
+* `docker rm basic_jwt_postgres`
 
 ## References
 
 * [Simple Http Auth example by Bernardas Ališauskas](https://github.com/Granitosaurus/sauth/blob/master/sauth.py)
 * [Basic Usages of Pipenv](https://pipenv-fork.readthedocs.io/en/latest/basics.html)
+* [Docker Run](https://docs.docker.com/engine/reference/commandline/run/)
+* [Connect From Your Local Machine to a PostgreSQL Docker Container](https://medium.com/better-programming/connect-from-local-machine-to-postgresql-docker-container-f785f00461a7)
