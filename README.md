@@ -8,11 +8,11 @@ The goal here is to learn a bit more about Python, [WSGI](https://www.python.org
 
 Although I will be making attempts to create a quality solution demonstrating some good practices, be reminded that this project is provided *without warranty* and is meant only as a hobby project. Do not deploy this to production or use it in critical systems.
 
-## Setup
+## Take-Aways
 
-These steps will need to be revisited and simplified if and when I get Docker containers built for everything.
+Some stuff I learned from working on this demo.
 
-### Python
+* `/docker-entrypoint-initdb.d` is a folder you can add to Docker images for first-run database initialization scripts
 
 Python 3 with pipenv is required. The dependency libpq is needed to install psycopg2.
 
@@ -21,14 +21,18 @@ Python 3 with pipenv is required. The dependency libpq is needed to install psyc
 
 ### Postgres 11
 
+TODO: this whole section should be replaced with building a Postgres-Alpine base image Docker container with schema init scripts, so that spinning up the db is a minimal effort
+
 If you don't already have Postgres installed, you'll need [to do that](https://www.postgresql.org/download/linux/ubuntu/) (unless you go the MongoDB route but I haven't added that yet.)
 
-You may want to spin up Postgres using Docker (see below), but be wary of running non-scalable databases in containers. Containers are generally meant to come and go, and having your database instance suddenly get wiped out generally results in data loss.
+You may want to spin up Postgres using Docker (see below), but be skeptical of running databases in containers. Containers are generally meant to come and go, and having your database instance suddenly get wiped out may result in data loss if you don't understand how Docker is managing your data files.
 
-* `sdocker run -p 5432:5432 --name basic_jwt_postgres -e POSTGRES_PASSWORD=adminpass postgres:alpine`
+* `docker run -p 5432:5432 --name basic_jwt_postgres -e POSTGRES_PASSWORD=adminpass postgres:alpine`
 * `psql -h localhost -p 5432 -U postgres -f user_credentials.sql`
 
-* TODO: populate the database with some test data
+* TODO: populate the database with some test data, eg. using the `add_user.py` script
+
+
 * TODO: creating the SSL certificate
 * TODO: creating the services, Docker containers
 * TODO: launching it all
@@ -57,7 +61,9 @@ Setup instructions for Postgres will be provided, and Mongo if I feel like it.
 * [psycopg2](https://www.psycopg.org/) for Postgres connection
 * Docker with Alpine base images to wrap the services
 
-## Docker Cheatsheet
+## Cheatsheet
+
+### Docker
 
 The `docker run` command is only used on first creating the container. You need more Docker-fu to manage existing containers. Exiting a running container doesn't delete it, merely stops it.
 
@@ -66,9 +72,15 @@ The `docker run` command is only used on first creating the container. You need 
 * `docker stop basic_jwt_postgres`
 * `docker rm basic_jwt_postgres`
 
+### Postgres
+
+* `psql -h localhost -p 5432 -U username -f script_to_run.sql`
+
 ## References
 
 * [Simple Http Auth example by Bernardas Ališauskas](https://github.com/Granitosaurus/sauth/blob/master/sauth.py)
+* [Python 3 Hashlib](https://docs.python.org/3/library/hashlib.html)
+* [BLAKE2](https://blake2.net/)
 * [Basic Usages of Pipenv](https://pipenv-fork.readthedocs.io/en/latest/basics.html)
 * [Docker Run](https://docs.docker.com/engine/reference/commandline/run/)
 * [Connect From Your Local Machine to a PostgreSQL Docker Container](https://medium.com/better-programming/connect-from-local-machine-to-postgresql-docker-container-f785f00461a7)
