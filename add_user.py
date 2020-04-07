@@ -25,8 +25,8 @@ def add_user(db_connection, username, password):
             sql.Identifier('grants')]),
         values = sql.SQL(',').join([
             sql.Literal(username),
-            sql.Literal(password_hash.hexdigest()),
-            sql.Literal(password_salt.hex),
+            sql.Literal(password_hash.digest()),
+            sql.Literal(password_salt.bytes),
             sql.Literal(grants)]))
 
     # can debug the query by outputting it like so
