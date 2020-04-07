@@ -10,12 +10,12 @@ db_connection_string = "dbname='postgres' user='postgres' host='localhost' passw
 def add_user(db_connection, username, password):
     db_cursor = db_connection.cursor()
 
-    password_salt = uuid.uuid4().bytes
-    password_hash = hashlib.blake2b(password.encode('utf-8'), salt=password_salt)
+    password_salt = uuid.uuid4()
+    password_hash = hashlib.blake2b(password.encode('utf-8'), salt=password_salt.bytes)
     grants = '{}'
 
     query = sql.SQL(
-        "INSERT INTO {table} {fields} VALUES ({values})")
+        "INSERT INTO {table} ({fields}) VALUES ({values})")
     query = query.format(
         table = sql.Identifier('user_credentials'),
         fields = sql.SQL(',').join([
@@ -25,12 +25,14 @@ def add_user(db_connection, username, password):
             sql.Identifier('grants')]),
         values = sql.SQL(',').join([
             sql.Literal(username),
-            sql.Literal(password_hash),
-            sql.Literal(password_salt),
+            sql.Literal(password_hash.hexdigest()),
+            sql.Literal(password_salt.hex),
             sql.Literal(grants)]))
 
-    print(query.as_string(db_cursor))
-    # db_cursor.execute(query)
+    # can debug the query by outputting it like so
+    # print(query.as_string(db_cursor))
+
+    db_cursor.execute(query)
 
 
 if __name__ == '__main__':
