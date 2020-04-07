@@ -30,7 +30,24 @@ You may want to spin up Postgres using Docker (see below), but be skeptical of r
 * `docker run -p 5432:5432 --name basic_jwt_postgres -e POSTGRES_PASSWORD=adminpass postgres:alpine`
 * `psql -h localhost -p 5432 -U postgres -f user_credentials.sql`
 
-* TODO: populate the database with some test data, eg. using the `add_user.py` script
+### User Credentials
+
+A script is provided for populating the database with some user credentials to try.
+
+* `python3 add_user.py my_user my_pass`
+
+### Grant Service
+
+Launch the service:
+
+* `gunicorn grant_service:api`
+
+Try a request:
+
+* `curl localhost:8000`
+
+It is convenient to use a tool like Postman for the Basic Auth header.
+
 
 
 * TODO: creating the SSL certificate
@@ -42,7 +59,7 @@ You may want to spin up Postgres using Docker (see below), but be skeptical of r
 
 Two services are provided: a grant service and a resource service. Requests must be SSH secured; a [self-signed certificate](https://en.wikipedia.org/wiki/Self-signed_certificate) is good enough for demo purposes. The JWT token itself will be signed using an assymetric RSA pair as well, so that (in theory) the identity of the grant service is well established.
 
-The grant service accepts Basic Auth requests and responds with a JWT on success. It reads credentials and JWT contents from a data store.
+The grant service accepts Basic Auth GET requests and responds with a JWT on success. It reads credentials and JWT contents from a data store.
 
 The resource service accepts JWT requests and responds with 202 Accepted only if the token is present and valid. This demonstrates the idea of [federated identity](https://en.wikipedia.org/wiki/Federated_identity) in a simple way.
 
