@@ -10,13 +10,10 @@ class GrantResource:
             response.status = falcon.HTTP_401
             return
 
-        auth_header = request.headers['AUTHORIZATION']
-        basic_str, auth_key = auth_header.split(' ')
-        if not basic_str.lower() == 'basic':
+        username, password = basic_auth.decode_header(request.headers['AUTHORIZATION'])
+        if username == False:
             response.status = falcon.HTTP_401
             return
-
-        username, password = basic_auth.decode(auth_key)
 
         # TODO: now read from Postgres and validate
 
