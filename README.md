@@ -36,6 +36,12 @@ A script is provided for populating the database with some user credentials to t
 
 * `python3 add_user.py my_user my_pass`
 
+### JWT Key
+
+The grant service expects a public RSA key in the file `jwt_key.pub` and the resource service expects a private RSA key in the file `jtw_key`. These can be generated with the tool `ssh-keygen`:
+
+* `ssh-keygen -t rsa -b 4096 -f jwt_key`
+
 ### Grant Service
 
 Launch the service:

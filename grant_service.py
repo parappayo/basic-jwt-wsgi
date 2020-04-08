@@ -1,4 +1,4 @@
-import falcon
+import falcon, jwt, base64
 from psycopg2 import connect, sql
 import basic_auth, password_crypto
 
@@ -6,6 +6,9 @@ import basic_auth, password_crypto
 # TODO: fetch db name, username, password from local secrets
 # it also needs to be shared by the script that builds the db docker image
 db_connection_string = "dbname='postgres' user='postgres' host='localhost' password='adminpass'"
+
+
+jwt_public_key = None
 
 
 def get_user_credentials(db_connection, username):
@@ -21,17 +24,12 @@ def get_user_credentials(db_connection, username):
             sql.Identifier('grants')]),
         username = sql.Literal(username));
 
-    # can debug the query by outputting it like so
-    print(query.as_string(db_cursor))
-
     db_cursor.execute(query)
     return db_cursor.fetchone()
 
 
 class GrantResource:
     def on_get(self, request, response):
-        print(request.headers)
-
         if not 'AUTHORIZATION' in request.headers:
             response.status = falcon.HTTP_401
             return
@@ -56,11 +54,14 @@ class GrantResource:
                 response.status = falcon.HTTP_403
                 return
 
-        # TODO: create the JWT
-
-        response.body = '{"message": "got here"}'
+        token = jwt.encode(grants, jwt_public_key, algorithm='RS256')
+        token_base64 = base64.b64encode(token).decode('utf-8')
+        response.media = {'token': token_base64}
         response.status = falcon.HTTP_200
 
+
+with open('jwt_key') as jwt_public_key_file:
+    jwt_public_key = jwt_public_key_file.read()
 
 api = falcon.API()
 api.add_route('/', GrantResource())

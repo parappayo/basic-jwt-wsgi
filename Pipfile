@@ -9,6 +9,7 @@ verify_ssl = true
 gunicorn = "*"
 falcon = "*"
 psycopg2 = "*"
+pyjwt = "*"
 
 [requires]
 python_version = "3.6"
