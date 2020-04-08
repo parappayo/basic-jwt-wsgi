@@ -36,6 +36,8 @@ A script is provided for populating the database with some user credentials to t
 
 * `python3 add_user.py my_user my_pass`
 
+* TODO: user records should include creation timestamp
+
 ### JWT Key
 
 The grant service expects a public RSA key in the file `jwt_key.pub` and the resource service expects a private RSA key in the file `jtw_key`. These can be generated with the tool `ssh-keygen`:
@@ -54,7 +56,7 @@ Try a request:
 
 It is convenient to use a tool like Postman for the Basic Auth header.
 
-
+* TODO: JWT should include standard stuff like time issued, expiry time
 
 * TODO: creating the SSL certificate
 * TODO: creating the services, Docker containers
