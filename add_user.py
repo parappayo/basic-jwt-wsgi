@@ -1,6 +1,7 @@
-import sys, hashlib, uuid
-
+import sys
 from psycopg2 import connect, sql
+import password_crypto
+
 
 # TODO: fetch db name, username, password from local secrets
 # it also needs to be shared by the script that builds the db docker image
@@ -10,8 +11,7 @@ db_connection_string = "dbname='postgres' user='postgres' host='localhost' passw
 def add_user(db_connection, username, password):
     db_cursor = db_connection.cursor()
 
-    password_salt = uuid.uuid4()
-    password_hash = hashlib.blake2b(password.encode('utf-8'), salt=password_salt.bytes)
+    password_salt, password_hash = password_crypto.encode(password)
     grants = '{}'
 
     query = sql.SQL(
@@ -25,8 +25,8 @@ def add_user(db_connection, username, password):
             sql.Identifier('grants')]),
         values = sql.SQL(',').join([
             sql.Literal(username),
-            sql.Literal(password_hash.digest()),
-            sql.Literal(password_salt.bytes),
+            sql.Literal(password_hash),
+            sql.Literal(password_salt),
             sql.Literal(grants)]))
 
     # can debug the query by outputting it like so
