@@ -8,7 +8,7 @@ import basic_auth, password_crypto
 db_connection_string = "dbname='postgres' user='postgres' host='localhost' password='adminpass'"
 
 
-jwt_public_key = None
+jwt_private_key = None
 
 
 def get_user_credentials(db_connection, username):
@@ -54,14 +54,14 @@ class GrantResource:
                 response.status = falcon.HTTP_403
                 return
 
-        token = jwt.encode(grants, jwt_public_key, algorithm='RS256')
+        token = jwt.encode(grants, jwt_private_key, algorithm='RS256')
         token_base64 = base64.b64encode(token).decode('utf-8')
         response.media = {'token': token_base64}
         response.status = falcon.HTTP_200
 
 
-with open('jwt_key') as jwt_public_key_file:
-    jwt_public_key = jwt_public_key_file.read()
+with open('jwt_key') as jwt_private_key_file:
+    jwt_private_key = jwt_private_key_file.read()
 
 api = falcon.API()
 api.add_route('/', GrantResource())

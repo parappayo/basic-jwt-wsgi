@@ -8,6 +8,8 @@ The goal here is to learn a bit more about Python, [WSGI](https://www.python.org
 
 Although I will be making attempts to create a quality solution demonstrating some good practices, be reminded that this project is provided *without warranty* and is meant only as a hobby project. Do not deploy this to production or use it in critical systems.
 
+Note that [Falcon provides authentication middleware](https://falcon-auth.readthedocs.io/en/latest/readme.html) and you should use that instead of my hobby project code.
+
 ## Take-Aways
 
 Some stuff I learned from working on this demo.
@@ -18,6 +20,11 @@ Python 3 with pipenv is required. The dependency libpq is needed to install psyc
 
 * `apt-get install libpq-dev`
 * `pipenv install`
+
+There is a weird inconsistency with how PyJWT handles private and public RSA keys. The private key is used to encode and the public key is used to decode, but this is backwards. PyJWT will fail to encode given a public key, with the error `AttributeError: '_RSAPublicKey' object has no attribute 'sign'`.
+
+* [PyJWT examples](https://pyjwt.readthedocs.io/en/latest/usage.html#encoding-decoding-tokens-with-hs256)
+* [RSA Cryptosystem on Wikipedia](https://en.wikipedia.org/wiki/RSA_%28cryptosystem%29)
 
 ### Postgres 11
 
@@ -48,14 +55,25 @@ The grant service expects a public RSA key in the file `jwt_key.pub` and the res
 
 Launch the service:
 
-* `gunicorn grant_service:api`
+* `gunicorn grant_service:api -b 8081`
 
 Try a request:
 
-* `curl localhost:8000`
+* `curl localhost:8081`
 
 It is convenient to use a tool like Postman for the Basic Auth header.
 
+### Resource Service
+
+Launch the service:
+
+* `gunicorn resource_service:api -b 8082`
+
+Make a GET request with Authenitcation Bearer and a JWT provided by the grant service.
+
+
+* TODO: basic auth should be a wsgi middleware
+* TODO: persistence layer should be a Python package, easy to swaps
 * TODO: JWT should include standard stuff like time issued, expiry time
 
 * TODO: creating the SSL certificate
@@ -103,6 +121,7 @@ The `docker run` command is only used on first creating the container. You need 
 
 ## References
 
+* [JWT.io Introduction](https://jwt.io/introduction/)
 * [Simple Http Auth example by Bernardas Ališauskas](https://github.com/Granitosaurus/sauth/blob/master/sauth.py)
 * [Python 3 Hashlib](https://docs.python.org/3/library/hashlib.html)
 * [BLAKE2](https://blake2.net/)
