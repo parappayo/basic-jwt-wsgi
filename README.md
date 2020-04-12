@@ -21,7 +21,7 @@ Python 3 with pipenv is required. The dependency libpq is needed to install psyc
 * `apt-get install libpq-dev`
 * `pipenv install`
 
-There is a weird inconsistency with how PyJWT handles private and public RSA keys. The private key is used to encode and the public key is used to decode, but this is backwards. PyJWT will fail to encode given a public key, with the error `AttributeError: '_RSAPublicKey' object has no attribute 'sign'`.
+There is an inconsistency with how PyJWT handles private and public RSA keys. The private key is used to encode and the public key is used to decode, but this is backwards from typical RSA usage. PyJWT will fail to encode given a public key, with the error `AttributeError: '_RSAPublicKey' object has no attribute 'sign'`.
 
 * [PyJWT examples](https://pyjwt.readthedocs.io/en/latest/usage.html#encoding-decoding-tokens-with-hs256)
 * [RSA Cryptosystem on Wikipedia](https://en.wikipedia.org/wiki/RSA_%28cryptosystem%29)
@@ -44,6 +44,7 @@ A script is provided for populating the database with some user credentials to t
 * `python3 add_user.py my_user my_pass`
 
 * TODO: user records should include creation timestamp
+* TODO: examples on how to set user grants
 
 ### JWT Key
 
@@ -74,7 +75,7 @@ Make a GET request with Authenitcation Bearer and a JWT provided by the grant se
 
 * TODO: basic auth should be a wsgi middleware
 * TODO: persistence layer should be a Python package, easy to swaps
-* TODO: JWT should include standard stuff like time issued, expiry time
+* TODO: JWT should include standard stuff like time issued, expiry time, username, IP address, user agent?
 
 * TODO: creating the SSL certificate
 * TODO: creating the services, Docker containers
@@ -97,12 +98,11 @@ Setup instructions for Postgres will be provided, and Mongo if I feel like it.
 
 ## Tech Stack
 
-* Nginx as a reverse proxy
 * [Falcon](https://falconframework.org/) + [Gunicorn](https://gunicorn.org/) to start
-  * Bjoern may be faster but probably harder to set up, consider it a stretch goal
+  * [Bjoern](https://github.com/jonashaag/bjoern) may be lighter, but probably harder to set up; consider it a stretch goal
 * [PyJWT](https://pyjwt.readthedocs.io/en/latest/) for token processing
-* [psycopg2](https://www.psycopg.org/) for Postgres connection
-* Docker with Alpine base images to wrap the services
+* [psycopg2](https://www.psycopg.org/) for [Postgres](https://www.postgresql.org/) connection
+* [Docker](https://www.docker.com/) with [Alpine](https://alpinelinux.org/) base images to wrap the servicesg
 
 ## Cheatsheet
 
@@ -128,3 +128,17 @@ The `docker run` command is only used on first creating the container. You need 
 * [Basic Usages of Pipenv](https://pipenv-fork.readthedocs.io/en/latest/basics.html)
 * [Docker Run](https://docs.docker.com/engine/reference/commandline/run/)
 * [Connect From Your Local Machine to a PostgreSQL Docker Container](https://medium.com/better-programming/connect-from-local-machine-to-postgresql-docker-container-f785f00461a7)
+* [A Performance Analysis of Python WSGI Servers - AppDynamics Eng Blog](https://www.appdynamics.com/blog/engineering/a-performance-analysis-of-python-wsgi-servers-part-2/)
+
+### Other Research Links
+
+Stuff that I came across while researching this project, but that aren't closely related.
+
+* [Nginx Reverse Proxy](https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/)
+* [OpenStack](https://www.openstack.org/)
+* [Heroku - Deploy with Docker](https://www.heroku.com/deploy-with-docker)
+* [Libraries.io](https://libraries.io/)
+* [httpbin.org](http://httpbin.org/)
+* [Werkzeug](https://werkzeug.palletsprojects.com/en/1.0.x/)
+* [SUNET wsgi_ratelimit](https://github.com/SUNET/wsgi_ratelimit)
+* [The Legion of the Bouncy Castle](https://www.bouncycastle.org/)
